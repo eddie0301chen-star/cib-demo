@@ -10,7 +10,7 @@ st.set_page_config(page_title="金融情報預警平台", layout="wide")
 
 # --- 系統狀態管理 ---
 if 'page' not in st.session_state:
-    st.session_state.page = "戰情總覽與處置矩陣"
+    st.session_state.page = "戰情總覽與防阻成效"
 if 'target_account' not in st.session_state:
     st.session_state.target_account = "ACCT_8839_A1"
 
@@ -50,7 +50,7 @@ st.sidebar.title("金融情報預警平台")
 st.sidebar.caption("國家級異常資金流分析核心")
 st.sidebar.markdown("---")
 
-pages = ["戰情總覽與處置矩陣", "模型庫與資料匯入測試", "單一帳戶深度調查", "國家級情報聯防網路"]
+pages = ["戰情總覽與防阻成效", "模型庫與資料匯入測試", "單一帳戶深度調查", "國家級情報聯防網路"]
 st.sidebar.radio("系統功能模組", pages, index=pages.index(st.session_state.page), key="sidebar_radio", on_change=set_page)
 
 st.sidebar.markdown("---")
@@ -59,12 +59,14 @@ st.sidebar.write("**當前掛載機制:** 假投資防堵專用版")
 st.sidebar.write("**觀測視窗:** 2 日內動態")
 
 # ==========================================
-# 頁面 1：戰情總覽與處置矩陣
+# 頁面 1：戰情總覽與防阻成效 (v10.0 全新排版)
 # ==========================================
-if st.session_state.page == "戰情總覽與處置矩陣":
-    st.title("戰情總覽與風險處置矩陣")
-    st.markdown("依據「前置行為觀察」與「資金突增觸發」兩階段邏輯，精準調控銀行防堵力道。")
+if st.session_state.page == "戰情總覽與防阻成效":
+    st.title("🛡️ 戰情總覽與防阻成效大屏")
+    st.markdown("追蹤即時資金異常動態與整體防堵效益，落實「前置觀察、觸發即鎖」之戰略目標。")
     
+    # 區塊 1：今日即時監控數據
+    st.subheader("即時監控數據 (今日)")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric(label="今日掃描交易總筆數", value="159,543", delta="12% 增長")
     col2.metric(label="高風險觀察名單 (列管中)", value="4", delta="🟡 待查核")
@@ -73,15 +75,16 @@ if st.session_state.page == "戰情總覽與處置矩陣":
     
     st.markdown("---")
     
-    st.markdown("### 自動化風險分級處置準則 (兩階段防堵機制)")
-    st.table(pd.DataFrame({
-        '風險區間': ['> 90分 (🔴 觸發處置)', '75 - 89分 (🟡 高風險觀察)', '< 75分 (🟢 正常)'],
-        '行為特徵狀態': ['列管中帳戶突然「動起來」：出現大額異常流入，並準備快速移轉', '出現前置洗錢行為 (如長久靜止戶突有小額測試、跨國IP頻繁登入)，但尚未有大筆資金', '行為落於常態分布範圍內'],
-        '系統自動處置建議': ['發布【圈存通報】，建議銀行立即圈存該筆匯入款，防止車手提領', '發布【觀察通知】，建議銀行對該戶加強查核與持續監控，不輕易鎖卡', '寫入背景監控日誌']
-    }))
-
+    # 區塊 2：長期攔截成效指標 (新增的亮點)
+    st.subheader("防堵成效追蹤 (累積攔截指標)")
+    col_a, col_b, col_c = st.columns(3)
+    col_a.metric(label="近 30 日成功處置帳戶數", value="128 戶", delta="較上月 +15% 處置效率")
+    col_b.metric(label="近 30 日累積攔阻金額", value="1.5 億 TWD", delta="實質防堵社會財損")
+    col_c.metric(label="本年度預估可攔阻總額", value="18.5 億 TWD", delta="基於當前 XGBoost 模型效能推算")
+    
     st.markdown("---")
     
+    # 區塊 3：高風險名單操作區 (移到中間，方便第一線人員點擊)
     colA, colB = st.columns(2)
     with colA:
         st.subheader("🟡 高風險觀察清單 (列管中)")
@@ -108,6 +111,16 @@ if st.session_state.page == "戰情總覽與處置矩陣":
                 c2.write(f"風險: {row['風險指數']}分")
                 c3.button("🚨 執行處置", key=f"btn_r_{index}", on_click=jump_to_investigate, args=(row['帳戶代碼'],), use_container_width=True)
                 st.divider()
+                
+    st.markdown("---")
+    
+    # 區塊 4：處置準則說明 (移到最下方當作附錄)
+    st.subheader("附錄：自動化風險分級處置準則 (兩階段防堵機制)")
+    st.table(pd.DataFrame({
+        '風險區間': ['> 90分 (🔴 觸發處置)', '75 - 89分 (🟡 高風險觀察)', '< 75分 (🟢 正常)'],
+        '行為特徵狀態': ['列管中帳戶突然「動起來」：出現大額異常流入，並準備快速移轉', '出現前置洗錢行為 (如長久靜止戶突有小額測試、跨國IP頻繁登入)，但尚未有大筆資金', '行為落於常態分布範圍內'],
+        '系統自動處置建議': ['發布【圈存通報】，建議銀行立即圈存該筆匯入款，防止車手提領', '發布【觀察通知】，建議銀行對該戶加強查核與持續監控，不輕易鎖卡', '寫入背景監控日誌']
+    }))
 
 # ==========================================
 # 頁面 2：模型庫與資料匯入測試 
@@ -281,7 +294,7 @@ elif st.session_state.page == "單一帳戶深度調查":
         st.success("行為腳本判定：未檢測出顯著之洗錢特徵，持續背景監控。")
 
 # ==========================================
-# 頁面 4：國家級情報聯防網路 (全白話文版)
+# 頁面 4：國家級情報聯防網路 
 # ==========================================
 elif st.session_state.page == "國家級情報聯防網路":
     st.title("🌐 跨機構情報整合：打通數據孤島")
